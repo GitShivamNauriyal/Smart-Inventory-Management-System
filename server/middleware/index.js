@@ -1,7 +1,6 @@
 const { execFile } = require("child_process");
 const path = require("path");
 
-// Sample test data
 const maxWeight = 50;
 const maxVolume = 100;
 const items = [
@@ -17,8 +16,7 @@ const args = [
     ...items.map((item) => item.join(",")),
 ];
 
-// Path to executable (adjust accordingly)
-const executablePath = path.resolve(__dirname, "../engine/knapsack.exe"); // or './inventory' for Linux/Mac
+const executablePath = path.resolve(__dirname, "../engine/knapsack.exe");
 
 execFile(executablePath, args, (err, stdout, stderr) => {
     if (err) {
