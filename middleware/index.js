@@ -1,6 +1,7 @@
 const { execFile } = require("child_process");
 const path = require("path");
 
+// Sample test data
 const maxWeight = 50;
 const maxVolume = 100;
 const items = [
@@ -9,23 +10,23 @@ const items = [
     [30, 120, 50, 1, 8],
 ];
 
-// args array: [50, 100, "10,60,20,2,5", "20,100,40,3,7", ...]
+// Prepare CLI arguments
 const args = [
     maxWeight.toString(),
     maxVolume.toString(),
     ...items.map((item) => item.join(",")),
 ];
 
-const exePath = path.resolve(__dirname, "../engine/knapsack.exe");
+// Path to executable (adjust accordingly)
+const executablePath = path.resolve(__dirname, "../engine/knapsack.exe"); // or './inventory' for Linux/Mac
 
-execFile(exePath, args, (err, stdout, stderr) => {
+execFile(executablePath, args, (err, stdout, stderr) => {
     if (err) {
-        console.error("Error:", err.message);
+        console.error("❌ Exec Error:", err.message);
         return;
     }
     if (stderr) {
-        console.error("Stderr:", stderr);
-        return;
+        console.error("⚠️ Stderr:", stderr);
     }
-    console.log("Max value:", stdout.trim());
+    console.log("✅ Output:", stdout.trim());
 });

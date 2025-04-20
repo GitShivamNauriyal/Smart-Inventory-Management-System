@@ -1,80 +1,84 @@
-#include <iostream>
-#include <vector>
-#include <sstream>
-#include <string>
-#include <algorithm>
+#include <bits/stdc++.h>
 
 struct Item
 {
-    int weight, value, volume, fragility, priority;
+    int weight, price, volume, fragility, priority;
+
+    // The profit is based on the price, priority, and fragility
+    int profit() const
+    {
+        return price + priority - fragility;
+    }
 };
 
-int knapsack(int maxWeight, int maxVolume, std::vector<Item> &items)
+int knapsack(int maxWeight, int maxVolume, const std::vector<Item> &items)
 {
-    int n = items.size();
-    // 3D DP: dp[i][w][v] = max score using first i items with weight w and volume v
-    std::vector<std::vector<std::vector<int>>> dp(n + 1, std::vector<std::vector<int>>(maxWeight + 1, std::vector<int>(maxVolume + 1, 0)));
+    std::vector<std::vector<int>> dp(maxWeight + 1, std::vector<int>(maxVolume + 1, 0));
 
-    for (int i = 1; i <= n; i++)
+    for (const auto &item : items)
     {
-        Item &item = items[i - 1];
-        int score = item.value + item.priority - item.fragility;
-
-        for (int w = 0; w <= maxWeight; w++)
+        for (int w = maxWeight; w >= item.weight; --w)
         {
-            for (int v = 0; v <= maxVolume; v++)
+            for (int v = maxVolume; v >= item.volume; --v)
             {
-                if (item.weight <= w && item.volume <= v)
-                {
-                    dp[i][w][v] = std::max(dp[i - 1][w][v],
-                                           dp[i - 1][w - item.weight][v - item.volume] + score);
-                }
-                else
-                {
-                    dp[i][w][v] = dp[i - 1][w][v];
-                }
+                dp[w][v] = std::max(dp[w][v], dp[w - item.weight][v - item.volume] + item.profit());
             }
         }
     }
 
-    return dp[n][maxWeight][maxVolume];
+    return dp[maxWeight][maxVolume];
 }
 
 int main(int argc, char *argv[])
 {
-    if (argc < 3)
+    if (argc < 4)
     {
-        std::cerr << "Usage: ./knapsack <maxWeight> <maxVolume> <item1_weight,item1_value,item1_volume,item1_fragility,item1_priority> ...\n";
+        std::cerr << "Usage: ./inventory <maxWeight> <maxVolume> <item1_weight,item1_price,item1_volume,item1_fragility,item1_priority> ...\n";
         return 1;
     }
 
-    int maxWeight = std::stoi(argv[1]);
-    int maxVolume = std::stoi(argv[2]);
+    int maxWeight, maxVolume;
+    try
+    {
+        maxWeight = std::stoi(argv[1]);
+        maxVolume = std::stoi(argv[2]);
+    }
+    catch (...)
+    {
+        std::cerr << "Error: maxWeight and maxVolume must be integers.\n";
+        return 1;
+    }
 
     std::vector<Item> items;
     for (int i = 3; i < argc; ++i)
     {
-        std::string arg = argv[i];
-        std::stringstream ss(arg);
+        std::stringstream ss(argv[i]);
         std::string token;
         std::vector<int> values;
 
         while (std::getline(ss, token, ','))
         {
-            values.push_back(std::stoi(token));
+            try
+            {
+                values.push_back(std::stoi(token));
+            }
+            catch (...)
+            {
+                std::cerr << "Error: Invalid item format in argument " << i << "\n";
+                return 1;
+            }
         }
 
-        if (values.size() == 5)
+        if (values.size() != 5)
         {
-            items.push_back({values[0], values[1], values[2], values[3], values[4]});
+            std::cerr << "Error: Each item must have 5 attributes (weight,price,volume,fragility,priority).\n";
+            return 1;
         }
-        else
-        {
-            std::cerr << "Invalid item format: " << arg << "\n";
-        }
+
+        items.push_back({values[0], values[1], values[2], values[3], values[4]});
     }
 
-    int result = knapsack(maxWeight, maxVolume, items);
-    std::cout << result << "\n";
+    int maxProfit = knapsack(maxWeight, maxVolume, items);
+    std::cout << "Maximum profit achievable: " << maxProfit << std::endl;
     return 0;
 }
