@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import { InputNumber } from "primereact/inputnumber";
+import { Button } from "primereact/button";
 
 const DEFAULT_ITEM = {
     weight: 10,
@@ -9,19 +11,33 @@ const DEFAULT_ITEM = {
     priority: 5,
 };
 
-function SliderInput({ label, value, min, max, onChange }) {
+function SliderInput({ label, icon, value, min, max, onChange }) {
     return (
-        <div style={{ marginBottom: 16 }}>
-            <label>
-                {label}:&nbsp;
-                <input
-                    type="number"
-                    value={value}
-                    min={min}
-                    max={max}
-                    onChange={(e) => onChange(Number(e.target.value))}
-                    style={{ width: 60, marginRight: 8 }}
-                />
+        <div className="mb-4">
+            <label className="text-sm font-semibold mb-1 flex items-center gap-2 text-gray-200">
+                <div>
+                    <i
+                        className={`pi pi-${icon} text-blue-400`}
+                        style={{ fontSize: "1.2em", marginRight: "4px" }}
+                    />
+                    {label}
+                </div>
+                <div className="ml-6">
+                    <InputNumber
+                        value={value}
+                        min={min}
+                        max={max}
+                        onValueChange={(e) => onChange(e.value)}
+                        showButtons
+                        buttonLayout="horizontal"
+                        style={{ width: 80 }}
+                        inputStyle={{
+                            width: 60,
+                            background: "#111827",
+                            color: "#fff",
+                        }}
+                    />
+                </div>
             </label>
             <input
                 type="range"
@@ -29,7 +45,7 @@ function SliderInput({ label, value, min, max, onChange }) {
                 max={max}
                 value={value}
                 onChange={(e) => onChange(Number(e.target.value))}
-                style={{ width: 200 }}
+                className="w-full accent-blue-500"
             />
         </div>
     );
@@ -37,16 +53,17 @@ function SliderInput({ label, value, min, max, onChange }) {
 
 function ItemInput({ item, onChange, onRemove }) {
     return (
-        <div
-            style={{
-                border: "1px solid #eee",
-                borderRadius: 8,
-                padding: 16,
-                marginBottom: 16,
-            }}
-        >
+        <div className="bg-gray-800 rounded-xl p-4 shadow flex flex-col gap-2 relative">
+            <Button
+                icon="pi pi-trash"
+                className="p-button-rounded p-button-text p-button-danger absolute"
+                style={{ top: 8, right: 8 }}
+                onClick={onRemove}
+                tooltip="Remove item"
+            />
             <SliderInput
                 label="Weight"
+                icon="box"
                 value={item.weight}
                 min={1}
                 max={100}
@@ -54,6 +71,7 @@ function ItemInput({ item, onChange, onRemove }) {
             />
             <SliderInput
                 label="Price"
+                icon="dollar"
                 value={item.price}
                 min={1}
                 max={500}
@@ -61,6 +79,7 @@ function ItemInput({ item, onChange, onRemove }) {
             />
             <SliderInput
                 label="Volume"
+                icon="database"
                 value={item.volume}
                 min={1}
                 max={100}
@@ -68,6 +87,7 @@ function ItemInput({ item, onChange, onRemove }) {
             />
             <SliderInput
                 label="Fragility"
+                icon="exclamation-triangle"
                 value={item.fragility}
                 min={0}
                 max={10}
@@ -75,14 +95,12 @@ function ItemInput({ item, onChange, onRemove }) {
             />
             <SliderInput
                 label="Priority"
+                icon="star"
                 value={item.priority}
                 min={0}
                 max={10}
                 onChange={(v) => onChange({ ...item, priority: v })}
             />
-            <button onClick={onRemove} style={{ color: "red", marginTop: 8 }}>
-                Remove Item
-            </button>
         </div>
     );
 }
@@ -97,10 +115,12 @@ export default function Dashboard() {
     ]);
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const calculateProfit = async () => {
         setLoading(true);
         setResult(null);
+        setError(null);
         try {
             const response = await fetch(
                 "http://localhost:5000/api/optimization/calculate",
@@ -114,103 +134,125 @@ export default function Dashboard() {
             if (data.maxProfit !== undefined) {
                 setResult(data.maxProfit);
             } else {
-                setResult("Error");
+                setError(data.error || "Unknown error");
             }
         } catch (e) {
-            setResult("Error");
+            setError("Network error, please try again.");
         }
         setLoading(false);
     };
 
     return (
-        <div
-            style={{
-                maxWidth: 600,
-                margin: "40px auto",
-                padding: 24,
-                background: "#f9f9f9",
-                borderRadius: 12,
-            }}
-        >
-            <h1 style={{ fontSize: 28, fontWeight: "bold", marginBottom: 24 }}>
-                Inventory Optimizer
-            </h1>
-            <h2 style={{ fontSize: 20, marginBottom: 8 }}>
-                Container Constraints
-            </h2>
-            <SliderInput
-                label="Max Weight"
-                value={maxWeight}
-                min={10}
-                max={200}
-                onChange={setMaxWeight}
-            />
-            <SliderInput
-                label="Max Volume"
-                value={maxVolume}
-                min={50}
-                max={500}
-                onChange={setMaxVolume}
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 flex flex-col items-center py-16 px-2">
+            {/* Header/Marketing */}
+            <div className="max-w-2xl text-center mb-8">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-2 tracking-tight">
+                    <span className="text-blue-400">Inventory Optimizer</span>
+                </h1>
+                <p className="text-lg md:text-xl text-gray-200 mb-3">
+                    Instantly maximize your inventory profit using our
+                    AI-powered knapsack algorithm.
+                    <br />
+                    <span className="text-blue-400 font-semibold">
+                        Try it below!
+                    </span>
+                </p>
+            </div>
+
+            {/* Constraints */}
+            <div className="w-full max-w-lg bg-gray-900 rounded-2xl shadow-lg p-8 mb-6 mx-auto">
+                <h2 className="text-2xl font-bold text-blue-400 mb-5 flex items-center gap-2 justify-center">
+                    <i className="pi pi-box" /> Container Constraints
+                </h2>
+                <SliderInput
+                    label="Max Weight"
+                    icon="box"
+                    value={maxWeight}
+                    min={10}
+                    max={200}
+                    onChange={setMaxWeight}
+                />
+                <SliderInput
+                    label="Max Volume"
+                    icon="database"
+                    value={maxVolume}
+                    min={50}
+                    max={500}
+                    onChange={setMaxVolume}
+                />
+            </div>
+
+            {/* Items */}
+            <div className="w-full max-w-5xl bg-gray-900 rounded-2xl shadow-lg p-8 mb-8 flex flex-col">
+                <div className="flex items-center justify-between mb-5">
+                    <h2 className="text-2xl font-bold text-blue-400 flex items-center gap-2">
+                        <i className="pi pi-list" /> Items
+                    </h2>
+                    <Button
+                        icon="pi pi-plus"
+                        label="Add Item"
+                        className="p-button-rounded p-button-success"
+                        onClick={() =>
+                            setItems([...items, { ...DEFAULT_ITEM }])
+                        }
+                    />
+                </div>
+                <div
+                    className="overflow-y-auto"
+                    style={{
+                        maxHeight: "540px",
+                        minHeight: "120px",
+                        paddingRight: 8,
+                        marginBottom: 8,
+                    }}
+                >
+                    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                        {items.length === 0 && (
+                            <div className="text-gray-400 italic mb-3">
+                                No items. Add some to optimize!
+                            </div>
+                        )}
+                        {items.map((item, idx) => (
+                            <ItemInput
+                                key={idx}
+                                item={item}
+                                onChange={(updated) => {
+                                    const newItems = [...items];
+                                    newItems[idx] = updated;
+                                    setItems(newItems);
+                                }}
+                                onRemove={() =>
+                                    setItems(items.filter((_, i) => i !== idx))
+                                }
+                            />
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Calculate Button */}
+            <Button
+                label={loading ? "Calculating..." : "Calculate Maximum Profit"}
+                icon={loading ? "pi pi-spin pi-spinner" : "pi pi-calculator"}
+                className="p-button-lg p-button-rounded p-button-info font-bold text-lg mb-6 w-full max-w-2xl"
+                onClick={calculateProfit}
+                disabled={loading}
             />
 
-            <h2 style={{ fontSize: 20, margin: "24px 0 8px" }}>Items</h2>
-            {items.map((item, idx) => (
-                <ItemInput
-                    key={idx}
-                    item={item}
-                    onChange={(updated) => {
-                        const newItems = [...items];
-                        newItems[idx] = updated;
-                        setItems(newItems);
-                    }}
-                    onRemove={() => setItems(items.filter((_, i) => i !== idx))}
-                />
-            ))}
-            <button
-                onClick={() => setItems([...items, { ...DEFAULT_ITEM }])}
-                style={{
-                    background: "#2563eb",
-                    color: "white",
-                    padding: "8px 16px",
-                    borderRadius: 6,
-                    marginBottom: 24,
-                }}
-            >
-                Add Item
-            </button>
-            <br />
-            <button
-                onClick={calculateProfit}
-                style={{
-                    background: "#059669",
-                    color: "white",
-                    padding: "12px 32px",
-                    borderRadius: 8,
-                    fontSize: 18,
-                    fontWeight: "bold",
-                    marginTop: 16,
-                    marginBottom: 24,
-                }}
-                disabled={loading}
-            >
-                {loading ? "Calculating..." : "Calculate Maximum Profit"}
-            </button>
-            {result !== null && (
-                <div
-                    style={{ marginTop: 24, fontSize: 22, fontWeight: "bold" }}
-                >
-                    {result === "Error" ? (
-                        <span style={{ color: "red" }}>
-                            Error calculating profit
-                        </span>
-                    ) : (
-                        <>
-                            Maximum Profit:{" "}
-                            <span style={{ color: "#059669" }}>{result}</span>
-                        </>
-                    )}
-                </div>
-            )}
+            {/* Result/Error */}
+            <div className="w-full max-w-2xl">
+                {error && (
+                    <div className="bg-red-900 text-red-200 rounded-xl p-4 text-center font-semibold shadow">
+                        {error}
+                    </div>
+                )}
+                {result !== null && !error && (
+                    <div className="bg-gray-800 text-green-400 rounded-xl p-6 text-center text-2xl font-bold shadow mt-4">
+                        Maximum Profit:{" "}
+                        <span className="text-green-300">{result}</span>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
