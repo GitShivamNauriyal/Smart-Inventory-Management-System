@@ -12,6 +12,9 @@ const DEFAULT_ITEM = {
 };
 
 function SliderInput({ label, icon, value, min, max, onChange }) {
+    // For the slider, clamp value to [min, max], but for input, allow any number
+    const sliderValue = Math.max(min, Math.min(max, value ?? min));
+
     return (
         <div className="mb-4">
             <label className="text-sm font-semibold mb-1 flex items-center gap-2 text-gray-200">
@@ -26,8 +29,16 @@ function SliderInput({ label, icon, value, min, max, onChange }) {
                     <InputNumber
                         value={value}
                         min={min}
-                        max={max}
-                        onValueChange={(e) => onChange(e.value)}
+                        // Don't set max here, so input can go higher
+                        onValueChange={(e) => {
+                            // Allow any number from the input box
+                            if (
+                                typeof e.value === "number" &&
+                                !isNaN(e.value)
+                            ) {
+                                onChange(e.value);
+                            }
+                        }}
                         showButtons
                         buttonLayout="horizontal"
                         style={{ width: 80 }}
@@ -43,7 +54,7 @@ function SliderInput({ label, icon, value, min, max, onChange }) {
                 type="range"
                 min={min}
                 max={max}
-                value={value}
+                value={sliderValue}
                 onChange={(e) => onChange(Number(e.target.value))}
                 className="w-full accent-blue-500"
             />
@@ -150,8 +161,8 @@ export default function Dashboard() {
                     <span className="text-blue-400">Inventory Optimizer</span>
                 </h1>
                 <p className="text-lg md:text-xl text-gray-200 mb-3">
-                    Instantly maximize your inventory profit using our
-                    AI-powered knapsack algorithm.
+                    Instantly maximize your inventory profit using our knapsack
+                    algorithm.
                     <br />
                     <span className="text-blue-400 font-semibold">
                         Try it below!

@@ -15,14 +15,13 @@ router.post("/calculate", (req, res) => {
     console.log(`  Constraints: weight=${maxWeight}, volume=${maxVolume}`);
     console.log(`  Received items (${items?.length || 0}):`, items || "none");
 
-    // Helper for precise timing
     function getExecTimeMs() {
         const [seconds, nanoseconds] = process.hrtime(startTime);
         return (seconds * 1000 + nanoseconds / 1e6).toFixed(2);
     }
 
     try {
-        // Phase 1: Basic validation
+        // Validation
         if (
             !maxWeight ||
             !maxVolume ||
@@ -31,12 +30,10 @@ router.post("/calculate", (req, res) => {
         ) {
             throw new Error("Missing required parameters");
         }
-
         if (isNaN(maxWeight) || isNaN(maxVolume)) {
             throw new Error("Invalid numeric constraints");
         }
 
-        // Phase 2: Item validation
         let validatedItems;
         try {
             validatedItems = items.map((item, index) => {
@@ -63,15 +60,6 @@ router.post("/calculate", (req, res) => {
             throw new Error(`Item validation failed: ${itemError.message}`);
         }
 
-        //Log validated items if needed
-        // console.log(
-        //     `[${timestamp}] [${requestId}] Validated items (${validatedItems.length}):`
-        // );
-        // validatedItems.forEach((item, i) =>
-        //     console.log(`  Item ${i + 1}:`, JSON.stringify(item))
-        // );
-
-        // Phase 3: Engine preparation
         const args = [
             maxWeight.toString(),
             maxVolume.toString(),
@@ -81,10 +69,7 @@ router.post("/calculate", (req, res) => {
             ),
         ];
 
-        const executablePath = path.resolve(
-            __dirname,
-            "../engine/knapsack.exe"
-        );
+        const executablePath = path.resolve(__dirname, "../engine/new.exe");
         console.log(
             `[${timestamp}] [${requestId}] Using engine: ${executablePath}`
         );
@@ -93,7 +78,6 @@ router.post("/calculate", (req, res) => {
             throw new Error("Optimization engine not found at specified path");
         }
 
-        // Phase 4: Execution
         execFile(executablePath, args, (err, stdout, stderr) => {
             const execTime = getExecTimeMs();
 
@@ -112,19 +96,17 @@ router.post("/calculate", (req, res) => {
             try {
                 const output = stdout.toString().trim();
                 console.log(
-                    `[${timestamp}] [${requestId}] Engine output:`,
+                    `[${timestamp}] [${requestId}] Engine output (${execTime}ms):`,
                     output
                 );
 
+                // Output is just a number (maxProfit)
                 if (!/^\d+$/.test(output)) {
-                    throw new Error("Unexpected output format");
+                    throw new Error("Invalid engine output format");
                 }
 
                 const maxProfit = parseInt(output, 10);
 
-                console.log(
-                    `[${timestamp}] [${requestId}] Calculation successful, Execution time: (${execTime}ms)`
-                );
                 res.json({
                     maxProfit,
                     metadata: {
