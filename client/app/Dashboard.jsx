@@ -16,7 +16,7 @@ function SliderInput({ label, icon, value, min, max, onChange }) {
     const sliderValue = Math.max(min, Math.min(max, value ?? min));
 
     return (
-        <div className="mb-4">
+        <div className="mb-3">
             <label className="text-sm font-semibold mb-1 flex items-center gap-2 text-gray-200">
                 <div>
                     <i
@@ -154,7 +154,7 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 flex flex-col items-center py-16 px-2">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 flex flex-col gap-4 items-center py-16 px-2">
             {/* Header/Marketing */}
             <div className="max-w-2xl text-center mb-8">
                 <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-2 tracking-tight">
@@ -171,7 +171,7 @@ export default function Dashboard() {
             </div>
 
             {/* Constraints */}
-            <div className="w-full max-w-lg bg-gray-900 rounded-2xl shadow-lg p-8 mb-6 mx-auto">
+            <div className="w-full max-w-lg bg-gray-900 rounded-2xl shadow-lg px-4 py-8 md:p-8 mb-6 mx-auto">
                 <h2 className="text-2xl font-bold text-blue-400 mb-5 flex items-center gap-2 justify-center">
                     <i className="pi pi-box" /> Container Constraints
                 </h2>
@@ -194,7 +194,7 @@ export default function Dashboard() {
             </div>
 
             {/* Items */}
-            <div className="w-full max-w-5xl bg-gray-900 rounded-2xl shadow-lg p-8 mb-8 flex flex-col">
+            <div className="w-full max-w-6xl bg-gray-900 rounded-2xl shadow-lg py-8 px-4 md:p-8 flex flex-col">
                 <div className="flex items-center justify-between mb-5">
                     <h2 className="text-2xl font-bold text-blue-400 flex items-center gap-2">
                         <i className="pi pi-list" /> Items
@@ -211,7 +211,7 @@ export default function Dashboard() {
                 <div
                     className="overflow-y-auto"
                     style={{
-                        maxHeight: "540px",
+                        maxHeight: "600px",
                         minHeight: "120px",
                         paddingRight: 8,
                         marginBottom: 8,
@@ -245,7 +245,7 @@ export default function Dashboard() {
             <Button
                 label={loading ? "Calculating..." : "Calculate Maximum Profit"}
                 icon={loading ? "pi pi-spin pi-spinner" : "pi pi-calculator"}
-                className="p-button-lg p-button-rounded p-button-info font-bold text-lg mb-6 w-full max-w-2xl"
+                className="p-button-lg p-button-rounded p-button-info font-bold text-lg my-6 w-full max-w-2xl"
                 onClick={calculateProfit}
                 disabled={loading}
             />
