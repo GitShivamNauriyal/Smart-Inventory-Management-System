@@ -30,13 +30,19 @@ router.post("/calculate", (req, res) => {
         ) {
             throw new Error("Missing required parameters");
         }
+        const sanitizedItems = items.map((item) => ({
+            ...item,
+            fractionable: !!item.fractionable,
+            parts: item.fractionable ? item.parts || 2 : 1,
+        }));
+
         if (isNaN(maxWeight) || isNaN(maxVolume)) {
             throw new Error("Invalid numeric constraints");
         }
 
         let validatedItems;
         try {
-            validatedItems = items.map((item, index) => {
+            validatedItems = sanitizedItems.map((item, index) => {
                 if (
                     !item ||
                     typeof item.weight === "undefined" ||
@@ -59,17 +65,28 @@ router.post("/calculate", (req, res) => {
         } catch (itemError) {
             throw new Error(`Item validation failed: ${itemError.message}`);
         }
+        const isFractional = items.some((item) => item?.fractionable === true);
+        const engine = isFractional
+            ? path.resolve(__dirname, "../engine/fractional.exe")
+            : path.resolve(__dirname, "../engine/new.exe");
 
         const args = [
             maxWeight.toString(),
             maxVolume.toString(),
-            ...validatedItems.map(
-                (item) =>
-                    `${item.weight},${item.price},${item.volume},${item.fragility},${item.priority}`
-            ),
+            ...validatedItems.map((item) => {
+                if (isFractional) {
+                    return `${item.weight},${item.price},${item.volume},${
+                        item.fragility
+                    },${item.priority},${item.fractionable ? 1 : 0},${
+                        item.fractionable ? item.parts || 2 : 1
+                    }`;
+                } else {
+                    return `${item.weight},${item.price},${item.volume},${item.fragility},${item.priority}`;
+                }
+            }),
         ];
 
-        const executablePath = path.resolve(__dirname, "../engine/new.exe");
+        const executablePath = engine;
         console.log(
             `[${timestamp}] [${requestId}] Using engine: ${executablePath}`
         );

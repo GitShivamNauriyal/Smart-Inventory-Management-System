@@ -9,6 +9,8 @@ const DEFAULT_ITEM = {
     volume: 20,
     fragility: 2,
     priority: 5,
+    fractionable: false,
+    parts: 2,
 };
 
 function SliderInput({ label, icon, value, min, max, onChange }) {
@@ -112,6 +114,26 @@ function ItemInput({ item, onChange, onRemove }) {
                 max={10}
                 onChange={(v) => onChange({ ...item, priority: v })}
             />
+            <label className="flex items-center gap-2 text-gray-200 mt-2">
+                <input
+                    type="checkbox"
+                    checked={item.fractionable}
+                    onChange={(e) =>
+                        onChange({ ...item, fractionable: e.target.checked })
+                    }
+                />
+                Allow fractional division
+            </label>
+            {item.fractionable && (
+                <SliderInput
+                    label="Parts"
+                    icon="sliders-h"
+                    value={item.parts ?? 2}
+                    min={2}
+                    max={10}
+                    onChange={(v) => onChange({ ...item, parts: v })}
+                />
+            )}
         </div>
     );
 }
@@ -120,10 +142,25 @@ export default function Dashboard() {
     const [maxWeight, setMaxWeight] = useState(50);
     const [maxVolume, setMaxVolume] = useState(100);
     const [items, setItems] = useState([
-        { weight: 10, price: 60, volume: 20, fragility: 2, priority: 5 },
-        { weight: 20, price: 100, volume: 40, fragility: 3, priority: 7 },
-        { weight: 30, price: 120, volume: 50, fragility: 1, priority: 8 },
+        { ...DEFAULT_ITEM },
+        {
+            ...DEFAULT_ITEM,
+            weight: 20,
+            price: 100,
+            volume: 40,
+            fragility: 3,
+            priority: 7,
+        },
+        {
+            ...DEFAULT_ITEM,
+            weight: 30,
+            price: 120,
+            volume: 50,
+            fragility: 1,
+            priority: 8,
+        },
     ]);
+
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -179,7 +216,7 @@ export default function Dashboard() {
                     label="Max Weight"
                     icon="box"
                     value={maxWeight}
-                    min={10}
+                    min={1}
                     max={200}
                     onChange={setMaxWeight}
                 />
@@ -187,7 +224,7 @@ export default function Dashboard() {
                     label="Max Volume"
                     icon="database"
                     value={maxVolume}
-                    min={50}
+                    min={1}
                     max={500}
                     onChange={setMaxVolume}
                 />
