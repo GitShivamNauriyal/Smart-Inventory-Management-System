@@ -15,13 +15,14 @@ inventory-optimizer/
 ├── client/                     # Frontend (Next.js)
 │   ├── public/                 # Static files (avatars, report, etc.)
 │   ├── app/                    # App router (Next.js 13+)
-│   │   ├── about.jsx           # About the project
+│   │   ├── about               # About the project
+│   │   │   └── About.jsx
+│   │   │   └── AnimatedTooltip.jsx
 │   │   ├── dashboard/          # Main Dashboard view
 │   │   │   └── Dashboard.jsx
 │   │   └── page.jsx            # Landing page "/"
-│   ├── components/             # Reusable UI components
-│   │   ├── Footer.jsx
-│   │   └── AnimatedTooltip.jsx
+│   ├── Footer.jsx
+│   ├── Navbar.jsx
 │   ├── styles/                 # Global CSS
 │   ├── utils/                  # Helpers (API, formatters)
 │   └── package.json
@@ -33,7 +34,7 @@ inventory-optimizer/
 │   ├── middleware/             # JWT, validation
 │   ├── services/               # Business logic, DB access
 │   ├── db/                     # SQLite files
-│   ├── cpp-engine/             # C++ optimization logic
+│   ├── engine/             # C++ optimization logic
 │   │   ├── zeroOneKnapsack.cpp
 │   │   ├── fractionalKnapsack.cpp
 │   │   ├── zeroOneKnapsack.exe
@@ -95,7 +96,7 @@ node server.js
 
 ### 4️⃣ Compile the C++ engine
 
-Go to `server/cpp-engine`:
+Go to `server/engine`:
 
 #### On **Linux/macOS**:
 
@@ -137,7 +138,7 @@ With both frontend and backend running:
 
 ## 📎 Resources
 
--   GitHub Repo: [Inventory Optimizer](https://github.com/your-org/inventory-optimizer)
+-   GitHub Repo: [Inventory Optimizer](https://github.com/GitShivamNauriyal/Smart-Inventory-Management-System)
 -   Tech stack: React, Next.js, TailwindCSS, Express.js, C++, SQLite
 
 ---
