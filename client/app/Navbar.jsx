@@ -19,7 +19,7 @@ const Navbar = () => {
                 </a>
 
                 {/* Simulated user state */}
-                <a
+                {/* <a
                     href="/about"
                     className="hover:text-blue-400 transition border-blue-400 hover:border-blue-600 border-[1px] p-3 rounded-lg "
                 >
@@ -31,7 +31,7 @@ const Navbar = () => {
                     <a href="#login" className="text-white transition">
                         Login
                     </a>
-                </Button>
+                </Button> */}
             </div>
         </div>
     );
