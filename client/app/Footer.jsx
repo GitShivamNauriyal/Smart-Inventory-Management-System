@@ -2,7 +2,7 @@ import React from "react";
 
 const Footer = () => {
     return (
-        <div className="bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 text-gray-300 py-16 px-6">
+        <div className="bg-gradient-to-tr from-gray-900 via-gray-950 to-gray-900 text-gray-300 py-16 px-6">
             <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
                 {/* Brand */}
                 <div>
@@ -40,7 +40,10 @@ const Footer = () => {
                             </a>
                         </li>
                         <li>
-                            <a href="#contact" className="hover:text-blue-400">
+                            <a
+                                href="https://github.com/GitShivamNauriyal/Smart-Inventory-Management-System"
+                                className="hover:text-blue-400"
+                            >
                                 Contact
                             </a>
                         </li>
